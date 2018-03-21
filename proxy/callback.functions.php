@@ -1,4 +1,9 @@
 <?php
+/*--------------------------------------------------------+
+| SYSTOPIA CiviProxy                                      |
+|  a simple proxy solution for external access to CiviCRM |
+| Author: McAndrews (michaelmcandrew@thirdsectordesign.org|
++---------------------------------------------------------*/
 
 function civiproxy_callback_validate_request_method($expected, $actual){
   if(is_array($expected) && in_array($actual, $expected)){

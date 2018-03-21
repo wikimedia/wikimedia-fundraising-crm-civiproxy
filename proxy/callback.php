@@ -1,4 +1,10 @@
 <?php
+/*--------------------------------------------------------+
+| SYSTOPIA CiviProxy                                      |
+|  a simple proxy solution for external access to CiviCRM |
+| Author: McAndrews (michaelmcandrew@thirdsectordesign.org|
++---------------------------------------------------------*/
+
 // Handles callback URLs as follows:
 // 1. Validates callback
 // 2. Passes to civicrm if the payload passes validation
