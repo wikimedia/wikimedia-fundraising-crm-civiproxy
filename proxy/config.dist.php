@@ -43,6 +43,11 @@ $target_mail_view = $target_civicrm . '/civicrm/mailing/view';
  **                    GENERAL OPTIONS                         **
  ****************************************************************/
 
+// Set this option to enable or disable callback processing
+//  The individual callbacks still have to be defined
+//  by the $callbacks variable, see below
+$callbacks_enabled = FALSE;
+
 // This logo is shown if the proxy server is address with a web browser
 //  add your own logo here
 $civiproxy_logo    = "<img src='{$proxy_base}/static/images/proxy-logo.png' alt='SYSTOPIA Organisationsberatung'></img>";
@@ -123,4 +128,20 @@ $rest_allowed_actions = array(
       ),
     ),
   ),
+);
+
+
+/****************************************************************
+ **                   ALLOWED CALLBACKS                        **
+ ****************************************************************/
+
+// defines the callbacks that are to be forwarded to the target system
+//  make sure $callbacks_enabled is TRUE for this to work
+$callbacks = array(
+  'sparkpost_example' => array(
+    'secret'         => '85c573b980c3c248f083f9ca6a175659',
+    'request_method' => 'POST', // single value or array
+    'content_type'   => 'application/json',
+    'target_path'    => 'civicrm/sparkpost/callback'
+  )
 );
