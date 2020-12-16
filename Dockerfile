@@ -27,3 +27,9 @@ RUN service apache2 restart
 RUN a2dissite 000-default.conf
 RUN a2dissite default-ssl.conf
 RUN a2ensite civiproxy.ssl.conf
+
+# xDebug for testing
+RUN pecl install xdebug-2.9.8
+RUN echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN docker-php-ext-enable xdebug
+RUN service apache2 restart
