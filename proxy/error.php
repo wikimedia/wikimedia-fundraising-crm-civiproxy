@@ -2,7 +2,7 @@
 /*--------------------------------------------------------+
 | SYSTOPIA CiviProxy                                      |
 |  a simple proxy solution for external access to CiviCRM |
-| Copyright (C) 2015 SYSTOPIA                             |
+| Copyright (C) 2015-2021 SYSTOPIA                        |
 | Author: B. Endres (endres -at- systopia.de)             |
 | http://www.systopia.de/                                 |
 +---------------------------------------------------------*/
@@ -15,7 +15,6 @@ require_once "proxy.php";
  <head>
   <meta charset="UTF-8">
   <title>CiviProxy Error</title>
-  <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <style type="text/css">
     body {
       margin: 0;
