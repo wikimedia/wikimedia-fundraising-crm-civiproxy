@@ -2,7 +2,7 @@
 /*--------------------------------------------------------+
 | SYSTOPIA CiviProxy                                      |
 |  a simple proxy solution for external access to CiviCRM |
-| Copyright (C) 2015 SYSTOPIA                             |
+| Copyright (C) 2015-2021 SYSTOPIA                        |
 | Author: B. Endres (endres -at- systopia.de)             |
 | http://www.systopia.de/                                 |
 +---------------------------------------------------------*/
@@ -17,7 +17,10 @@ if (!$target_open) civiproxy_http_error("Feature disabled", 405);
 civiproxy_security_check('open');
 
 // basic restraints
-$valid_parameters = array(  'q'   => 'int'  );
+$valid_parameters = [
+  'q'   => 'int',
+  'qid' => 'int',
+];
 
 $parameters = civiproxy_get_parameters($valid_parameters);
 civiproxy_redirect($target_open, $parameters);

@@ -2,7 +2,8 @@
 /*--------------------------------------------------------+
 | SYSTOPIA CiviProxy                                      |
 |  a simple proxy solution for external access to CiviCRM |
-| Copyright (C) 2015 SYSTOPIA                             |
+|                                                         |
+| Copyright (C) 2015-2021 SYSTOPIA                        |
 | Author: B. Endres (endres -at- systopia.de)             |
 | http://www.systopia.de/                                 |
 +---------------------------------------------------------*/
@@ -11,8 +12,15 @@
 /****************************************************************
  **                      INSTALLATION                          **
  **                                                            **
+ **  0. Read https://docs.civicrm.org/civiproxy/en/latest      **
  **  1. Make a copy of this file called config.php             **
+ **  2. Adjust the parameters and enable needed features       **
+ **  3. Some features (like mailings) require the CiviProxy    **
+ **     extension to be enabled on the target CiviCRM          **
+ **                                                            **
  ****************************************************************/
+
+
 
 
 /****************************************************************
@@ -33,15 +41,18 @@ $target_civicrm = 'https://your.civicrm.installation.org';
 
 // default paths, override if you want. Set to NULL to disable
 $target_rest      = $target_civicrm . '/sites/all/modules/civicrm/extern/rest.php';
+// base URL for api4 calls. Will append entity and action path segments
+$target_rest4     = $target_civicrm . '/civicrm/ajax/api4/';
 $target_file      = $target_civicrm . '/sites/default/files/civicrm/persist/';
 $target_mosaico   = NULL; // (disabled by default): $target_civicrm . '/civicrm/mosaico/img?src=';
+$target_mosaico_template_url = NULL; // (disabled by default): $target_civicrm . '/wp-content/uploads/civicrm/ext/uk.co.vedaconsulting.mosaico/packages/mosaico/templates/';
 $target_mail_view = $target_civicrm . '/civicrm/mailing/view';
 $target_url       = $target_civicrm . '/civicrm/mailing/url';
 $target_open      = $target_civicrm . '/civicrm/mailing/open';
 
-// CAUTION: use the following for CiviCRM < 5.27
-$target_url       = $target_civicrm . '/sites/all/modules/civicrm/extern/url.php';
-$target_open      = $target_civicrm . '/sites/all/modules/civicrm/extern/open.php';
+// CAUTION: use the following for CiviCRM < 5.27 or "Extern URL Style" = "Standalone Scripts" 
+#$target_url       = $target_civicrm . '/sites/all/modules/civicrm/extern/url.php';
+#$target_open      = $target_civicrm . '/sites/all/modules/civicrm/extern/open.php';
 
 
 /****************************************************************
@@ -50,11 +61,11 @@ $target_open      = $target_civicrm . '/sites/all/modules/civicrm/extern/open.ph
 
 // This logo is shown if the proxy server is address with a web browser
 //  add your own logo here
-$civiproxy_logo    = "<img src='{$proxy_base}/static/images/proxy-logo.png' alt='SYSTOPIA Organisationsberatung'></img>";
-
+$civiproxy_logo = "<img src='{$proxy_base}/static/images/proxy-logo.png' alt='SYSTOPIA Organisationsberatung'></img>";
 
 // Set api-key for mail subscribe/unsubscribe user
 // Set to NULL/FALSE to disable the feature
+// Can/shoud also be defined in secrets.php
 $mail_subscription_user_key = NULL;
 
 // CAREFUL: only enable temporarily on debug systems.
@@ -66,32 +77,40 @@ $debug                      = NULL; //'LUXFbiaoz4dVWuAHEcuBAe7YQ4YP96rN4MCDmKj89
 // This is useful in some VPN configurations (see CURLOPT_INTERFACE)
 $target_interface           = NULL;
 
-/****************************************************************
- **                   File Caching Options                     **
- ****************************************************************/
+// API and SITE keys (you may add keys here)
+$api_key_map = [
+  'my_api_key'   => 'my_api_key',   // use this to allow API key
+  'ext_api_key'  => 'real_api_key'  // use this to allow and map API key
+];
+$sys_key_map = [
+  'REAL_SITE_KEY' => 'REAL_SITE_KEY', // use this to allow site key
+  'EXT_SITE_KEY'  => 'REAL_SITE_KEY'  // use this to allow and map site key
+];
 
-// API and SITE keys
-$api_key_map = array();
-$sys_key_map = array();
-
+// source secrets.php to overwrite keys
 if (file_exists(dirname(__FILE__)."/secrets.php")) {
   // keys can also be stored in 'secrets.php'
   require "secrets.php";
 }
 
+
+/****************************************************************
+ **                   File Caching Options                     **
+ ****************************************************************/
+
 // define file cache options, see http://pear.php.net/manual/en/package.caching.cache-lite.cache-lite.cache-lite.php
-$file_cache_options = array(
+$file_cache_options = [
     'cacheDir' => 'file_cache/',
     'lifeTime' => 86400
-);
+];
 
 // define regex patterns that shoud NOT be accepted
-$file_cache_exclude = array();
+$file_cache_exclude = [];
 
 // if set, cached file must match at least one of these regex patterns
-$file_cache_include = array(
+$file_cache_include = [
         //'#.+[.](png|jpe?g|gif)#i'           // only media files
-    );
+    ];
 
 
 
@@ -108,33 +127,35 @@ $rest_evaluate_json_parameter = FALSE;
 // - if a request comes in and the IP is not a key in the array, the whitelisted in 'all' are used
 // - if a request comes in and the IP is indeed a key in the array, the whitelisted in the IP are checked first. If nothing is
 //   found ,the 'all' ones are checked next.
-$rest_allowed_actions = array(
-  'all' => array(
-    'Contact' => array(
-      'getsingle' => array(
+$rest_allowed_actions = [
+  'all' => [
+    'Contact' => [
+      'getsingle' => [
         'email' => 'string',
-      ),
-    ),
-  ),
-  '123.45.67.8' => array(
-    'Contact' => array(
-      'getsingle' => array(
+      ],
+    ],
+  ],
+  '123.45.67.8' => [
+    'Contact' => [
+      'getsingle' => [
         'first_name' => 'string',
         'last_name' => 'string',
         // the following means *all* remaining parameters will be
         //   added and sanitised as 'string'. Better leave it out
         //   if you know which parameters you expect
         '*' => 'string',
-      ),
-    ),
-  ),
-);
+      ],
+    ],
+  ],
+];
 
 
 /****************************************************************
  **                WebHook2API CONFIGURATIONS                  **
+ **  Translates typical webhook calls into CiviCRM API calls   **
  ****************************************************************/
-# remove if you don't want this feature or rename to $webhook2api to activate
+// Example configuration:
+// remove if you don't want this feature or rename to $webhook2api to activate
 $_webhook2api = [
     "configurations" => [
         "default" => [

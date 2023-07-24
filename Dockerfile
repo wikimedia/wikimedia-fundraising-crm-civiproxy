@@ -1,8 +1,6 @@
-# Build: `docker build . -t civiproxy`
-# Run: `docker run -d  --net=host --name civiproxy civiproxy`
+# Build: `docker build -t civiproxy .`
+# Run: `docker run --rm -v $PWD/proxy/config.php:/var/www/html/config.php --name civiproxy civiproxy`
 # Browse: https://localhost:4050
-
-# This is a multi-stage build file. See https://docs.docker.com/develop/dev-best-practices/
 
 # Generate SSL/TLS cert and key.
 FROM debian:buster-slim AS cert_builder
