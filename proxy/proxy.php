@@ -112,7 +112,7 @@ function civiproxy_redirect4($url_requested, $parameters, $api_key) {
   } else {
     // GET requests will get the parameters as url params
     if (!empty($parameters)) {
-      $url .= '?params=' . urlencode(json_encode($parameters)) . "&api_key=$api_key";
+      $url .= '?params=' . urlencode(json_encode($parameters)) . '&api_key=' . urlencode($api_key);
     }
   }
 
