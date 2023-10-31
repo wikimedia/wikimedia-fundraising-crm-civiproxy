@@ -27,7 +27,7 @@ function civiproxy_map_api_key(&$credentials, $api_key_map) {
     if (isset($api_key_map[$credentials['api_key']])) {
       $credentials['api_key'] = $api_key_map[$credentials['api_key']];
     }
-	else {
+    else {
       civiproxy_rest_error("Invalid api key");
     }
   }
@@ -53,7 +53,7 @@ function civiproxy_get_valid_parameters(array $action, array $rest_allowed_actio
     if (isset($rest_allowed_actions[$action['entity']]) && isset($rest_allowed_actions[$action['entity']][$action['action']])) {
       $valid_parameters = $rest_allowed_actions[$action['entity']][$action['action']];
     }
-	else {
+    else {
       civiproxy_rest_error("Invalid entity/action.");
     }
   }

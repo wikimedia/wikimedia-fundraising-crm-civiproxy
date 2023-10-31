@@ -26,13 +26,13 @@ $credentials = civiproxy_get_parameters(array('api_key' => 'string'));
 if (empty($credentials['api_key'])) {
   foreach (['AUTHORIZATION', 'X_CIVI_AUTH'] as $header) {
     if (!empty($_SERVER['HTTP_' . $header])) {
-	  foreach (['Bearer', 'Basic'] as $prefix) {
-	    if (strpos($_SERVER['HTTP_' . $header], $prefix) === 0) {
-		  $credentials['api_key'] = trim( str_replace( $prefix, '', $_SERVER['HTTP_' . $header] ) );
-		  break 2;
-		}
-	  }
-	}
+      foreach (['Bearer', 'Basic'] as $prefix) {
+        if (strpos($_SERVER['HTTP_' . $header], $prefix) === 0) {
+          $credentials['api_key'] = trim( str_replace( $prefix, '', $_SERVER['HTTP_' . $header] ) );
+          break 2;
+        }
+      }
+    }
   }
 }
 
