@@ -21,16 +21,8 @@ if (!civiproxy_security_check('rest')) {
 
 // check credentials
 $credentials = civiproxy_get_parameters(array('key' => 'string', 'api_key' => 'string'));
-if (empty($credentials['key'])) {
-  civiproxy_rest_error("No site key given");
-} else {
-  if (isset($sys_key_map[$credentials['key']])) {
-    $credentials['key'] = $sys_key_map[$credentials['key']];
-  } else {
-    civiproxy_rest_error("Invalid site key");
-  }
-}
 
+civiproxy_map_site_key($credentials, $sys_key_map);
 civiproxy_map_api_key($credentials, $api_key_map);
 
 // check if the call itself is allowed
