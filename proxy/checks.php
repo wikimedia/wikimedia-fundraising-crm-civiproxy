@@ -66,7 +66,7 @@ function civiproxy_get_valid_parameters(array $action, array $rest_allowed_actio
     // get valid key for the rest_allowed_actions
     $valid_allowed_key = civiproxy_get_valid_allowed_actions_key($action, $rest_allowed_actions);
     $valid_parameters = civiproxy_retrieve_api_parameters($valid_allowed_key, $action['entity'], $action['action'], $rest_allowed_actions);
-    if (!$valid_parameters) {
+    if ($valid_parameters === null) {
       civiproxy_rest_error("Invalid entity/action.");
     }
   }
