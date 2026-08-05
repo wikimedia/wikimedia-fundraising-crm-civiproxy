@@ -8,8 +8,7 @@
 +---------------------------------------------------------*/
 
 require_once "config.php";
-require_once "proxy.php";
-require_once "checks.php";
+require_once "../vendor/autoload.php";
 
 // see if REST API is enabled
 if (!$target_rest) civiproxy_http_error("Feature disabled", 405);
@@ -26,7 +25,7 @@ civiproxy_map_site_key($credentials, $sys_key_map);
 civiproxy_map_api_key($credentials, $api_key_map);
 
 // check if the call itself is allowed
-$action = civiproxy_get_parameters(array('entity' => 'string', 'action' => 'string', 'version' => 'int', 'json' => 'int', 'sequential' => 'int'));
+$action = civiproxy_get_parameters(array('entity' => 'string', 'action' => 'string', 'version' => 'int', 'json' => 'string', 'sequential' => 'int'));
 if (!isset($action['version']) || $action['version'] != 3) {
   civiproxy_rest_error("API 'version' information missing.");
 }

@@ -48,7 +48,7 @@ function civiproxy_map_site_key(array &$credentials, array $sys_key_map) {
     if (isset($sys_key_map[$credentials['key']])) {
       $credentials['key'] = $sys_key_map[$credentials['key']];
     }
-    else {
+	else {
       civiproxy_rest_error("Invalid site key");
     }
   }

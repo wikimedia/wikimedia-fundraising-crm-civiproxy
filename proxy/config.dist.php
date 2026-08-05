@@ -51,9 +51,16 @@ $target_url       = $target_civicrm . '/civicrm/mailing/url';
 $target_open      = $target_civicrm . '/civicrm/mailing/open';
 
 // CAUTION: use the following for CiviCRM < 5.27 or "Extern URL Style" = "Standalone Scripts" 
-#$target_url       = $target_civicrm . '/sites/all/modules/civicrm/extern/url.php';
-#$target_open      = $target_civicrm . '/sites/all/modules/civicrm/extern/open.php';
+//$target_url       = $target_civicrm . '/sites/all/modules/civicrm/extern/url.php';
+//$target_open      = $target_civicrm . '/sites/all/modules/civicrm/extern/open.php';
 
+/****************************************************************
+ **                    Plugins                                 **
+ ****************************************************************/
+$plugins = [
+  //'\Systopia\CiviProxy\Plugin\Logger\Plugin',
+  // Add your plugins here by adding the fully qualified class name of the Plugin Class
+];
 
 /****************************************************************
  **                    GENERAL OPTIONS                         **
@@ -77,6 +84,11 @@ $debug                      = NULL; //'LUXFbiaoz4dVWuAHEcuBAe7YQ4YP96rN4MCDmKj89
 // This is useful in some VPN configurations (see CURLOPT_INTERFACE)
 $target_interface           = NULL;
 
+// The API key to acces the CiviProxy api
+// The CiviProxy api lets CiviCRM connect to proxy to do stuff. Such as reading the log.
+// Set NULL to disable. 
+$proxyApiKey              = NULL; // 'SomeRandomKey' When NULL this functionality is disabled.
+
 
 /***************************************************************
  **                Authentication Options                     **
@@ -97,12 +109,29 @@ if (file_exists(dirname(__FILE__)."/secrets.php")) {
   require "secrets.php";
 }
 
+// Parameter whitelisting for open tracking and URL tracking
+// basic civicrm URL/open parameter are u, q and qid (as int)
+// If additional parameters are needed, best practise would be to whitelist each one as needed in
+// $valid_url_parameters and/or $valid_open_parameters.
+// Alternatively it is also possible to allow all parameters with the wildcard parameter '*' => 'string'
+$valid_url_parameters = [
+    'u'   => 'int',
+    'q'   => 'int',
+    'qid' => 'int',
+//    '*'   => 'string'     // whildcard, whitelist all url parameters
+];
+$valid_open_parameters = [
+    'u'   => 'int',
+    'q'   => 'int',
+    'qid' => 'int',
+//    '*'   => 'string'     // wildcard, whitelist *all* open parameters
+];
 // CiviCRM's API can authenticate with different flows
 // https://docs.civicrm.org/dev/en/latest/framework/authx/#flows
 // CiviProxy supports 'header', 'xheader', 'legacyrest', and 'param'.
 // These flows are supported for API4 but could be extended to API3.
-// authx_internal_flow controls how CiviProxy sends credentials to CiviCRM, and
-// authx_external_flow where CiviProxy looks for credentials on incoming requests.
+// $authx_internal_flow controls how CiviProxy sends credentials to CiviCRM, and
+// $authx_external_flow where CiviProxy looks for credentials on incoming requests.
 // The internal setting needs to have a single scalar value, but the
 // external setting can be an array of accepted flows.
 // There is no standard header for site key, so in both header and xheader
@@ -129,7 +158,61 @@ $file_cache_include = [
         //'#.+[.](png|jpe?g|gif)#i'           // only media files
     ];
 
+/****************************************************************
+ **                   Logger Plugin Options                    **
+ ****************************************************************/
 
+ // Make sure you enabled the logger in the plugin sections.
+$loggerPluginConfiguration = [
+  // redis
+  'primaryLogger' => 'redis',
+  'fallbackLogger' => 'filesystem',
+  'redis' => [
+    // or socket: /var/run/redis.sock
+    'host' => '10.5.0.69',
+    // Leave empty to use default 6379
+    'port' => '',
+    // The name of the list is where the messages are stored
+    'stream' => 'civiproxy',
+    // Use an array like ['pass' => 'password'] for password only authentication. 
+    // Use ['user' => 'username', 'pass' => 'password'] for authentication with usename and password.
+    // Use [] for no authentication.
+    'auth' => [],
+    // Set time out in seconds (float). 0 means use default timeout
+    'timeout' => '0.5',
+  ],
+  'filesystem' => [
+    'directory' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'logs',
+    'archive' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'archive',
+    // Remove log files from archive after 1 day
+    'keep_archive' => 1,
+    'rotation' => [
+      'enabled' => true,
+      'max_calls_per_file' => 100,
+      // 1 hour
+      'max_time_per_file' => 3600,
+    ],
+  ],
+  // List of api entities & action to log (or queue)
+  'entities' => [
+    [
+      'entity' => 'Contact',
+      // Provide the name of the action or * means any action.
+      'action' => '*',
+      // When this TRUE we do not connect to CiviCRM but we do log the call. Also provide a queueResponse
+      'queueOnly' => FALSE,
+      'queueReponse' => [],
+    ],
+    [
+      'entity' => 'Email',
+      // Provide the name of the action or * means any action.
+      'action' => '*',
+      // When this TRUE we do not connect to CiviCRM but we do log the call. Also provide a queueResponse
+      'queueOnly' => TRUE,
+      'queueReponse' => ['is_error' => '0'],
+    ],
+  ]
+];
 
 /****************************************************************
  **                   REST API OPTIONS                         **
