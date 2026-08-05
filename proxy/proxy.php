@@ -26,6 +26,7 @@ use Systopia\CiviProxy\Events\RedirectErrorEvent;
  */
 function civiproxy_redirect($url_requested, $parameters) {
   global $target_interface;
+  global $allow_self_signed_cert;
   $url = $url_requested;
   $curlSession = curl_init();
 
@@ -53,7 +54,12 @@ function civiproxy_redirect($url_requested, $parameters) {
   curl_setopt($curlSession, CURLOPT_HEADER, 1);
   curl_setopt($curlSession, CURLOPT_RETURNTRANSFER,1);
   curl_setopt($curlSession, CURLOPT_TIMEOUT, 30);
-  curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
+  if ($allow_self_signed_cert) {
+    curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER, 0);
+  } else {
+    curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
+  }
   curl_setopt($curlSession, CURLOPT_FAILONERROR, true);
   if (!empty($target_interface)) {
     curl_setopt($curlSession, CURLOPT_INTERFACE, $target_interface);
@@ -131,6 +137,7 @@ function civiproxy_redirect($url_requested, $parameters) {
  */
 function civiproxy_redirect4($url_requested, $parameters, $credentials) {
   global $target_interface, $authx_internal_flow;
+  global $allow_self_signed_cert;
   $url = $url_requested;
   $curlSession = curl_init();
   $credential_params = civiproxy_build_credential_params($credentials, $authx_internal_flow);
@@ -156,7 +163,12 @@ function civiproxy_redirect4($url_requested, $parameters, $credentials) {
   curl_setopt($curlSession, CURLOPT_HEADER, 1);
   curl_setopt($curlSession, CURLOPT_RETURNTRANSFER,1);
   curl_setopt($curlSession, CURLOPT_TIMEOUT, 30);
-  curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
+  if ($allow_self_signed_cert) {
+    curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER, 0);
+  } else {
+    curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
+  }
   curl_setopt($curlSession, CURLOPT_FAILONERROR, true);
   if (!empty($target_interface)) {
     curl_setopt($curlSession, CURLOPT_INTERFACE, $target_interface);
